@@ -4,7 +4,7 @@
 #define HEIGHT 600
 #define WIDTH 600
 #define NCIRC 1
-#define BARL 100
+#define BARL 200
 #define BARW 10
 struct circle {
   int x;
@@ -15,11 +15,10 @@ struct circle {
   float d;
 };
 int player = HEIGHT / 2;
-int ai = HEIGHT / 2;
-struct circle circles[NCIRC] = {{300, 200, 10, 1, 2.3, 0.8}};
+struct circle circles[NCIRC] = {{300, 200, 10, 3, 2.3, 0.8}};
 void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
                 int r) { // code taken from GFG Midpoint cirle algorithm
-  SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+  // SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
   int x = r, y = 0;
   SDL_RenderDrawPoint(render, x + x_centre, y + y_centre);
   SDL_RenderDrawLine(render, x_centre - x, y_centre, x + x_centre, y_centre);
@@ -49,16 +48,17 @@ void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
   }
 }
 void drawbar(SDL_Renderer *render, int y) {
-  SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+  // SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
   SDL_Rect l = {0, player, BARW, BARL};
   SDL_RenderFillRect(render, &l);
-  SDL_Rect r = {WIDTH - BARW, y, BARW, BARL};
+  SDL_Rect r = {WIDTH - BARW, y - BARL / 2, BARW, BARL};
   SDL_RenderFillRect(render, &r);
 }
 void draw(SDL_Renderer *r) {
   for (int i = 0; i < NCIRC; i++) {
-    // circles[i].vx += 0.3f;
-    // circles[i].vy += 0.3f;
+    // circles[i].vx *= 1.01f;
+    // circles[i].vy *= 1.01f;
+    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
     circles[i].y += circles[i].vy;
     circles[i].x += circles[i].vx;
     drawcircle(r, circles[i].x, circles[i].y, circles[i].r);
@@ -73,16 +73,25 @@ void draw(SDL_Renderer *r) {
     if (circles[i].x >= WIDTH - BARW) {
       circles[i].x = WIDTH - circles[i].r;
       circles[i].vx = -circles[i].vx;
-      printf("nah my bad i messed up\n");
-
+      // circles[i].vx *= 1.05f;
     } else if (circles[i].x <= 0 + BARW) {
       if (circles[i].y <= player + BARL && circles[i].y >= player) {
         circles[i].x = circles[i].r;
         circles[i].vx = -circles[i].vx;
+        // circles[i].vy *= 1.05f;
+      } else {
+        SDL_SetRenderDrawColor(r, 0, 0, 0, 255); // set color black
+        SDL_RenderClear(r);
+        SDL_SetRenderDrawColor(r, 255, 0, 0, 255);
+        drawcircle(r, circles[i].x, circles[i].y, circles[i].r);
+        SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+        drawbar(r, circles[i].y);
+        SDL_RenderPresent(r);
+        usleep(1000 * 1000);
+        exit(0);
+        SDL_SetRenderDrawColor(r, 0, 255, 0, 255); // set color black
+        SDL_RenderClear(r);
       }
-      printf("nah u lost\n");
-      SDL_SetRenderDrawColor(r, 0, 255, 0, 255); // set color black
-      SDL_RenderClear(r);
     }
   }
 }
@@ -97,10 +106,10 @@ int main() {
       break;
     } else if (e.type == SDL_KEYDOWN) {
       SDL_Keycode key = e.key.keysym.sym;
-      printf("%d\n", key);
+      // printf("%d\n", key);
       if (key == 119 && player > 1) {
         player -= 10;
-      } else if (key == 115 && player < HEIGHT - 2) {
+      } else if (key == 115 && player + BARL < HEIGHT - 2) {
         player += 10;
       }
     }
