@@ -7,8 +7,10 @@ struct circle {
   int x;
   int y;
   int r;
+  float v;
+  int d;
 };
-struct circle circles[NCIRC] = {{100, 100, 10}};
+struct circle circles[NCIRC] = {{100, 100, 10, 2, 1}};
 void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
                 int r) { // code taken from GFG Midpoint cirle algorithm
   SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
@@ -81,13 +83,18 @@ void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
 }
 void draw(SDL_Renderer *r) {
   for (int i = 0; i < NCIRC; i++) {
-    circles[i].y += 1;
+    circles[i].v += 0.3f;
+    circles[i].y += circles[i].v;
     drawcircle(r, circles[i].x, circles[i].y, circles[i].r);
+    if (circles[i].y + circles[i].r >= HEIGHT) {
+      circles[i].y = HEIGHT - circles[i].r;
+      circles[i].v = -0.8f * circles[i].v;
+    }
   }
 }
 int main() {
   SDL_Init(SDL_INIT_VIDEO);
-  SDL_Window *w = SDL_CreateWindow("", 0, 0, HEIGHT, WIDTH, 0);
+  SDL_Window *w = SDL_CreateWindow("", 0, 0, WIDTH, HEIGHT, 0);
   SDL_Renderer *r = SDL_CreateRenderer(w, -1, 0);
   SDL_Event e;
   while (e.type != SDL_QUIT) {
