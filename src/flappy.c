@@ -5,7 +5,7 @@
 #define HEIGHT 600
 #define WIDTH 600
 #define NCIRC 1
-#define SPACE 150
+#define SPACE 150 // VSPACE BETWEEN SAMME PIPE
 #define BARW 85
 #define QMAX 6
 #define HSPACE 300
@@ -116,10 +116,24 @@ void drawbar(SDL_Renderer *render) {
     }
   }
 }
+void check() {
+  if (flappy.x >= bars.queue[bars.front].x &&
+      flappy.x <= bars.queue[bars.front].x + BARW) {
+    if (flappy.y >= bars.queue[bars.front].y &&
+        flappy.y <= bars.queue[bars.front].y + SPACE) {
+      return;
+    }
+  } else {
+    return;
+  }
+  usleep(1000 * 200);
+  exit(0);
+}
 void update(SDL_Renderer *r) {
   // drawcircle(r, flappy.x, flappy.y, flappy.r);
   //  printf("update\n");
-  if (flappy.y + flappy.r >= HEIGHT) {
+  check();
+  if (flappy.y + flappy.r >= HEIGHT || flappy.y - flappy.r < 0) {
     usleep(1000 * 200);
     exit(0);
   }
