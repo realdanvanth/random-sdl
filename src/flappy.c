@@ -8,6 +8,7 @@
 #define SPACE 150
 #define BARW 85
 #define QMAX 6
+#define HSPACE 300
 struct circle {
   int x;
   int y;
@@ -26,7 +27,7 @@ struct queue {
   struct bars queue[QMAX];
 };
 struct queue bars;
-struct circle flappy = {50, 300, 10, 0, 2};
+struct circle flappy = {100, 300, 25, 0, 2};
 void init() {
   bars.front = -1;
   bars.end = -1;
@@ -57,7 +58,7 @@ void insert(int x, int y) {
 // struct bars bar[4] = {{0, 300}, {150, 250}, {300, 300}, {450, 200}};
 void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
                 int r) { // code taken from GFG Midpoint cirle algorithm
-  // SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+  SDL_SetRenderDrawColor(render, 227, 245, 66, 255);
   int x = r, y = 0;
   SDL_RenderDrawPoint(render, x + x_centre, y + y_centre);
   SDL_RenderDrawLine(render, x_centre - x, y_centre, x + x_centre, y_centre);
@@ -117,7 +118,11 @@ void drawbar(SDL_Renderer *render) {
 }
 void update(SDL_Renderer *r) {
   // drawcircle(r, flappy.x, flappy.y, flappy.r);
-  // printf("update\n");
+  //  printf("update\n");
+  if (flappy.y + flappy.r >= HEIGHT) {
+    usleep(1000 * 200);
+    exit(0);
+  }
   drawbar(r);
   if (bars.front <= bars.end) {
     for (int i = bars.front; i <= bars.end; i++) {
@@ -137,12 +142,14 @@ void update(SDL_Renderer *r) {
     //(bars.end + 1) % QMAX);
   }
   if (bars.queue[bars.end].x + 150 < WIDTH) {
-    insert(bars.queue[bars.end].x + 150, rand() % (HEIGHT - SPACE));
+    insert(bars.queue[bars.end].x + HSPACE, rand() % (HEIGHT - SPACE));
     // printf("front %d end %d\n", bars.front, bars.end);
     // printf("inserted front %d end %d next %d\n", bars.front, bars.end,
     //(bars.end + 1) % QMAX);
   }
   // printf("front %d end %d", bars.front, bars.end);
+  drawcircle(r, flappy.x, flappy.y, flappy.r);
+  flappy.y += 1;
 }
 int main() {
   SDL_Init(SDL_INIT_VIDEO);
@@ -157,6 +164,9 @@ int main() {
     } else if (e.type == SDL_KEYDOWN) {
       SDL_Keycode key = e.key.keysym.sym;
       // printf("%d\n", key);
+      if (key == 32) {
+        flappy.y -= 50;
+      }
     }
     SDL_SetRenderDrawColor(r, 111, 223, 232, 255); // set color black
     SDL_RenderClear(r);
