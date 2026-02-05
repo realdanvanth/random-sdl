@@ -5,7 +5,7 @@
 #define HEIGHT 600
 #define WIDTH 600
 #define NCIRC 1
-#define SPACE 150 // VSPACE BETWEEN SAMME PIPE
+#define SPACE 50
 #define BARW 85
 #define QMAX 6
 #define HSPACE 300
@@ -19,6 +19,7 @@ struct circle {
 struct bars {
   int x;
   int y;
+  int space;
 };
 struct queue {
   int front;
@@ -40,17 +41,19 @@ void delete() {
   bars.size--;
   bars.front = (bars.front + 1) % QMAX;
 }
-void insert(int x, int y) {
+void insert(int x, int y, int space) {
   // printf("hellooooo\n");
   if (bars.front == -1 && bars.end == -1) {
     bars.front = 0;
     bars.end = 0;
     bars.queue[bars.front].x = x;
     bars.queue[bars.front].y = y;
+    bars.queue[bars.front].space = space;
   } else {
     bars.end = (bars.end + 1) % QMAX;
     bars.queue[bars.end].x = x;
     bars.queue[bars.end].y = y;
+    bars.queue[bars.end].space = space;
     // printf("hello\n");
   }
   bars.size++;
@@ -58,7 +61,7 @@ void insert(int x, int y) {
 // struct bars bar[4] = {{0, 300}, {150, 250}, {300, 300}, {450, 200}};
 void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
                 int r) { // code taken from GFG Midpoint cirle algorithm
-  SDL_SetRenderDrawColor(render, 227, 245, 66, 255);
+  // SDL_SetRenderDrawColor(render, 227, 245, 66, 255);
   int x = r, y = 0;
   SDL_RenderDrawPoint(render, x + x_centre, y + y_centre);
   SDL_RenderDrawLine(render, x_centre - x, y_centre, x + x_centre, y_centre);
@@ -95,45 +98,54 @@ void drawbar(SDL_Renderer *render) {
     for (int i = bars.front; i <= bars.end; i++) {
       SDL_Rect bh = {bars.queue[i].x, 0, BARW, bars.queue[i].y};
       SDL_RenderFillRect(render, &bh);
-      SDL_Rect bl = {bars.queue[i].x, bars.queue[i].y + SPACE, BARW,
-                     HEIGHT - (bars.queue[i].y + SPACE)};
+      SDL_Rect bl = {bars.queue[i].x, bars.queue[i].y + bars.queue[i].space,
+                     BARW, HEIGHT - (bars.queue[i].y + bars.queue[i].space)};
       SDL_RenderFillRect(render, &bl);
     }
   else {
     for (int i = bars.front; i < QMAX; i++) {
       SDL_Rect bh = {bars.queue[i].x, 0, BARW, bars.queue[i].y};
       SDL_RenderFillRect(render, &bh);
-      SDL_Rect bl = {bars.queue[i].x, bars.queue[i].y + SPACE, BARW,
-                     HEIGHT - (bars.queue[i].y + SPACE)};
+      SDL_Rect bl = {bars.queue[i].x, bars.queue[i].y + bars.queue[i].space,
+                     BARW, HEIGHT - (bars.queue[i].y + bars.queue[i].space)};
       SDL_RenderFillRect(render, &bl);
     }
     for (int i = 0; i <= bars.end; i++) {
       SDL_Rect bh = {bars.queue[i].x, 0, BARW, bars.queue[i].y};
       SDL_RenderFillRect(render, &bh);
-      SDL_Rect bl = {bars.queue[i].x, bars.queue[i].y + SPACE, BARW,
-                     HEIGHT - (bars.queue[i].y + SPACE)};
+      SDL_Rect bl = {bars.queue[i].x, bars.queue[i].y + bars.queue[i].space,
+                     BARW, HEIGHT - (bars.queue[i].y + bars.queue[i].space)};
       SDL_RenderFillRect(render, &bl);
     }
   }
 }
-void check() {
+void check(SDL_Renderer *r) {
   if (flappy.x >= bars.queue[bars.front].x &&
       flappy.x <= bars.queue[bars.front].x + BARW) {
     if (flappy.y >= bars.queue[bars.front].y &&
-        flappy.y <= bars.queue[bars.front].y + SPACE) {
+        flappy.y <= bars.queue[bars.front].y + bars.queue[bars.front].space) {
       return;
     }
   } else {
     return;
   }
-  usleep(1000 * 200);
+  // SDL_SetRenderDrawColor(r, 255, 0, 0, 255);
+  drawbar(r);
+  SDL_SetRenderDrawColor(r, 255, 0, 0, 255);
+  // drawbar(r);
+  drawcircle(r, flappy.x, flappy.y, flappy.r);
+  // drawbar(r);
+  SDL_RenderPresent(r);
+  // printf("hello\n");
+  usleep(1000 * 400);
   exit(0);
 }
+
 void update(SDL_Renderer *r) {
   // drawcircle(r, flappy.x, flappy.y, flappy.r);
   //  printf("update\n");
-  check();
-  if (flappy.y + flappy.r >= HEIGHT || flappy.y - flappy.r < 0) {
+  check(r);
+  if (flappy.y + flappy.r >= HEIGHT) {
     usleep(1000 * 200);
     exit(0);
   }
@@ -156,12 +168,15 @@ void update(SDL_Renderer *r) {
     //(bars.end + 1) % QMAX);
   }
   if (bars.queue[bars.end].x + 150 < WIDTH) {
-    insert(bars.queue[bars.end].x + HSPACE, rand() % (HEIGHT - SPACE));
+    insert(bars.queue[bars.end].x + HSPACE, rand() % (HEIGHT - SPACE),
+           rand() % 75 + SPACE);
+    printf("%d\n", bars.queue[bars.end].space);
     // printf("front %d end %d\n", bars.front, bars.end);
     // printf("inserted front %d end %d next %d\n", bars.front, bars.end,
     //(bars.end + 1) % QMAX);
   }
   // printf("front %d end %d", bars.front, bars.end);
+  SDL_SetRenderDrawColor(r, 227, 245, 66, 255);
   drawcircle(r, flappy.x, flappy.y, flappy.r);
   flappy.y += 1;
 }
