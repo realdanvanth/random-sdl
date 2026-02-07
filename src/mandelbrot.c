@@ -6,7 +6,7 @@
 #define WIDTH 600
 #define HOFF HEIGHT / 2
 #define WOFF WIDTH / 2
-#define N 100
+#define N 255 * 3
 void calculatePoint(SDL_Renderer *r, int x, int y) {
   // min max scaling formula
   double x1 = -2.0 + (x + WOFF * 1.0) / 200.0;
@@ -19,6 +19,10 @@ void calculatePoint(SDL_Renderer *r, int x, int y) {
     i++;
   }
   if (i >= N) {
+    SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
+    SDL_RenderDrawPoint(r, x + WOFF, y + HOFF);
+  } else {
+    SDL_SetRenderDrawColor(r, i, 0, 0, 255);
     SDL_RenderDrawPoint(r, x + WOFF, y + HOFF);
   }
   return;
