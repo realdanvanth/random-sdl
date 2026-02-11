@@ -1,16 +1,22 @@
 #include <SDL2/SDL.h>
 #include <complex.h>
-#include <math.h>
 #include <unistd.h>
 #define HEIGHT 400
 #define WIDTH 600
-#define HOFF HEIGHT / 2
-#define WOFF WIDTH / 2
-#define N 255 * 3
+#define N 255
+double startx = -2;
+double endx = 1;
+double starty = 1;
+double endy = -1;
+double zoom = 1;
+// double w = (startx - endx) / zoom;
+// double h = (starty - endy) / zoom;
 void calculatePoint(SDL_Renderer *r, int x, int y) {
   // min max scaling formula
-  double x1 = -2.0 + (x + WOFF * 1.0) / 200.0;
-  double y1 = y / (HOFF * 1.0);
+  double w = (endx - startx);
+  double h = (endy - starty);
+  double x1 = startx + ((x)*w) / (WIDTH - 1);
+  double y1 = starty + ((y)*h) / (HEIGHT - 1);
   double complex c = x1 + I * y1;
   double complex z = 0;
   int i = 0;
@@ -19,18 +25,22 @@ void calculatePoint(SDL_Renderer *r, int x, int y) {
     i++;
   }
   if (i >= N) {
-    SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
-    SDL_RenderDrawPoint(r, x + WOFF, y + HOFF);
+    // SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+    SDL_RenderDrawPoint(r, x, y);
   } else {
-    SDL_SetRenderDrawColor(r, i, 0, 0, 255);
-    SDL_RenderDrawPoint(r, x + WOFF, y + HOFF);
+    c = c * c;
+    z = z * z;
+    // SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
+    SDL_SetRenderDrawColor(r, 0, 0, 0, 255);
+    SDL_RenderDrawPoint(r, x, y);
   }
   return;
 }
 void draw(SDL_Renderer *r) {
   SDL_SetRenderDrawColor(r, 255, 255, 255, 255);
-  for (int i = HEIGHT / 2; i >= -HEIGHT / 2; i--) {
-    for (int j = -WIDTH / 2; j <= WIDTH / 2; j++) {
+  for (int i = 0; i < HEIGHT; i++) {
+    for (int j = 0; j < WIDTH; j++) {
       calculatePoint(r, j, i);
     }
   }
