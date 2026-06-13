@@ -15,22 +15,8 @@ void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
                 int r) { // code taken from GFG Midpoint cirle algorithm
   SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
   int x = r, y = 0;
-  // Printing the initial point on the axes
-  // after translation
   SDL_RenderDrawPoint(render, x + x_centre, y + y_centre);
   SDL_RenderDrawLine(render, x_centre - x, y_centre, x + x_centre, y_centre);
-  // When radius is zero only a single
-  // point will be printed
-  /*if (r > 0) {
-    // printf("(%d, %d) ", x + x_centre, -y + y_centre);
-    SDL_RenderDrawPoint(render, x + x_centre, -y + y_centre);
-    // printf("(%d, %d) ", y + x_centre, x + y_centre);
-    SDL_RenderDrawPoint(render, y + x_centre, y + y_centre);
-    // printf("(%d, %d)\n", -y + x_centre, x + y_centre);
-    SDL_RenderDrawPoint(render, -y + x_centre, x + y_centre);
-  }*/
-
-  // Initialising the value of P
   int P = 1 - r;
   while (x > y) {
     y++;
@@ -49,33 +35,13 @@ void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
     if (x < y)
       break;
 
-    // Printing the generated point and its reflection
-    // in the other octants after translation
-    // printf("(%d, %d) ", x + x_centre, y + y_centre);
-    // SDL_RenderDrawPoint(render, x + x_centre, y + y_centre);
-    // printf("(%d, %d) ", -x + x_centre, y + y_centre);
-    // SDL_RenderDrawPoint(render, -x + x_centre, y + y_centre);
     SDL_RenderDrawLine(render, x + x_centre, y + y_centre, -x + x_centre,
                        y + y_centre);
-    // printf("(%d, %d) ", x + x_centre, -y + y_centre);
-    // SDL_RenderDrawPoint(render, x + x_centre, -y + y_centre);
-    // printf("(%d, %d)\n", -x + x_centre, -y + y_centre);
-    // SDL_RenderDrawPoint(render, -x + x_centre, -y + y_centre);
     SDL_RenderDrawLine(render, x + x_centre, -y + y_centre, -x + x_centre,
                        -y + y_centre);
-    // If the generated point is on the line x = y then
-    // the perimeter points have already been printed
     if (x != y) {
-      // printf("(%d, %d) ", y + x_centre, x + y_centre);
-      // SDL_RenderDrawPoint(render, y + x_centre, x + y_centre);
-      // printf("(%d, %d) ", -y + x_centre, x + y_centre);
-      // SDL_RenderDrawPoint(render, -y + x_centre, x + y_centre);
       SDL_RenderDrawLine(render, y + x_centre, x + y_centre, -y + x_centre,
                          x + y_centre);
-      // printf("(%d, %d) ", y + x_centre, -x + y_centre);
-      // SDL_RenderDrawPoint(render, y + x_centre, -x + y_centre);
-      // printf("(%d, %d)\n", -y + x_centre, -x + y_centre);
-      // SDL_RenderDrawPoint(render, -y + x_centre, -x + y_centre);
       SDL_RenderDrawLine(render, y + x_centre, -x + y_centre, -y + x_centre,
                          -x + y_centre);
     }

@@ -1,5 +1,4 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_render.h>
 #include <unistd.h>
 #define HEIGHT 600
 #define WIDTH 600
@@ -12,10 +11,9 @@ struct circle {
   int r;
   float vx;
   float vy;
-  float d;
 };
 int player = HEIGHT / 2;
-struct circle circles[NCIRC] = {{300, 200, 10, 3, 2.3, 0.8}};
+struct circle circles[NCIRC] = {{300, 200, 10, 3, 2}};
 void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
                 int r) { // code taken from GFG Midpoint cirle algorithm
   // SDL_SetRenderDrawColor(render, 255, 255, 255, 255);

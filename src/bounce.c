@@ -1,8 +1,11 @@
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_render.h>
 #include <unistd.h>
-#define HEIGHT 640
-#define WIDTH 480
+#define HEIGHT 600
+#define WIDTH 600
 #define NCIRC 1
+#define BARL 100
+#define BARW 10
 struct circle {
   int x;
   int y;
@@ -11,7 +14,9 @@ struct circle {
   float vy;
   float d;
 };
-struct circle circles[NCIRC] = {{300, 200, 10, 2.39, 1.5, 0.99}};
+int player = HEIGHT / 2;
+int ai = HEIGHT / 2;
+struct circle circles[NCIRC] = {{300, 200, 10, 1, 2.3, 0.8}};
 void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
                 int r) { // code taken from GFG Midpoint cirle algorithm
   SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
@@ -43,6 +48,13 @@ void drawcircle(SDL_Renderer *render, int x_centre, int y_centre,
     }
   }
 }
+void drawbar(SDL_Renderer *render, int y) {
+  SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+  SDL_Rect l = {0, player, BARW, BARL};
+  SDL_RenderFillRect(render, &l);
+  SDL_Rect r = {WIDTH - BARW, y, BARW, BARL};
+  SDL_RenderFillRect(render, &r);
+}
 void draw(SDL_Renderer *r) {
   for (int i = 0; i < NCIRC; i++) {
     // circles[i].vx += 0.3f;
@@ -50,19 +62,27 @@ void draw(SDL_Renderer *r) {
     circles[i].y += circles[i].vy;
     circles[i].x += circles[i].vx;
     drawcircle(r, circles[i].x, circles[i].y, circles[i].r);
-    if (circles[i].y + circles[i].r >= HEIGHT) {
+    drawbar(r, circles[i].y);
+    if (circles[i].y >= HEIGHT) {
       circles[i].y = HEIGHT - circles[i].r;
-      circles[i].vy = -circles[i].d * circles[i].vy;
-    } else if (circles[i].y + circles[i].r <= 0) {
+      circles[i].vy = -circles[i].vy;
+    } else if (circles[i].y <= 0) {
       circles[i].y = circles[i].r;
-      circles[i].vy = -circles[i].d * circles[i].vy;
+      circles[i].vy = -circles[i].vy;
     }
-    if (circles[i].x + circles[i].r >= WIDTH) {
+    if (circles[i].x >= WIDTH - BARW) {
       circles[i].x = WIDTH - circles[i].r;
-      circles[i].vx = -circles[i].d * circles[i].vx;
-    } else if (circles[i].x <= 0) {
-      circles[i].x = circles[i].r;
-      circles[i].vx = -circles[i].d * circles[i].vx;
+      circles[i].vx = -circles[i].vx;
+      printf("nah my bad i messed up\n");
+
+    } else if (circles[i].x <= 0 + BARW) {
+      if (circles[i].y <= player + BARL && circles[i].y >= player) {
+        circles[i].x = circles[i].r;
+        circles[i].vx = -circles[i].vx;
+      }
+      printf("nah u lost\n");
+      SDL_SetRenderDrawColor(r, 0, 255, 0, 255); // set color black
+      SDL_RenderClear(r);
     }
   }
 }
@@ -73,6 +93,17 @@ int main() {
   SDL_Event e;
   while (e.type != SDL_QUIT) {
     SDL_PollEvent(&e);
+    if (e.type == SDL_QUIT) {
+      break;
+    } else if (e.type == SDL_KEYDOWN) {
+      SDL_Keycode key = e.key.keysym.sym;
+      printf("%d\n", key);
+      if (key == 119 && player > 1) {
+        player -= 10;
+      } else if (key == 115 && player < HEIGHT - 2) {
+        player += 10;
+      }
+    }
     SDL_SetRenderDrawColor(r, 0, 0, 0, 255); // set color black
     SDL_RenderClear(r);
     draw(r);

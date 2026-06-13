@@ -18,10 +18,15 @@ struct body {
   float fy;
 };
 struct body bodies[N] = {
-    {0, 0, 150, 0.0f, 0.0f, 0, 0},   // Sun (heavy, at center)
-    {200, 0, 40, 0.0f, -1.5f, 0, 0}, // Planet
-    {250, 0, 15, 0.0f, -2.2f, 0, 0}  // Moon
-};
+    // Sun (fixed-ish)
+    {0, 0, 200, 0.0f, 0.0f, 0, 0},
+
+    // Planet
+    {300, 0, 40, 0.0f, 1.8f, 0, 0},
+
+    // Moon (relative to planet)
+    {340, 0, 15, 0.0f, 2.6f, 0, 0}};
+
 void drawcircle(SDL_Renderer *render, int x_centre, int y_centre, int r) {
   SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
   x_centre += WOFF;
